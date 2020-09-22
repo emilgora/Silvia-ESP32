@@ -26,7 +26,7 @@ int fooBar = 0;
 double sensor = 0; //hardware defined value (in this case from PT100 RTD Sensor attached to boiler)
 double targetTemp = 0; //user defined value (in this case from web page)
 
-double output = 0; //post processed value
+double output = 0; //post-pid value
 
 void setup(void)
 {
@@ -35,9 +35,10 @@ void setup(void)
   u8x8.begin();
   u8x8.setPowerSave(0);
 
-  u8x8.setFont(u8x8_font_amstrad_cpc_extended_f);
-  u8x8.drawString(4,3,"Loading");
-  u8x8.drawString(2,5,"please wait.");
+  u8x8.setFont(u8x8_font_courB24_3x4_r);
+  u8x8.setCursor(0, 0);
+  u8x8.drawString(0,0,"Load");
+  u8x8.drawString(0,4,"ing.");
   delay(5000);
   u8x8.clear();
 
@@ -45,16 +46,16 @@ void setup(void)
 
 void loop(void)
 {
-
-// 3x6 font for set temp read + weather icon
+  //u8x8_font_profont29_2x3_n
+  //open_iconic_play_4x
+  //open_iconic_thing_4x
 
   //get sensor value
   //set temperature target value
   double output=pid.getOutput(sensor,targetTemp);
   //do something with the output
   Serial.println(output);
+  u8x8.drawString(0, 0, String(output).c_str());
   delay(50);
-  
-
   
 }

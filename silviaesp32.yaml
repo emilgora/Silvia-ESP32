@@ -17,7 +17,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "silviaesphotspot"
-    password: "blah"
+    password: "blahblah"
 
 captive_portal:
 

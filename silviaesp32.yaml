@@ -1,0 +1,32 @@
+esphome:
+  name: silviaesp32
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: "emiladhoc"
+  password: "coffeetime"
+  power_save_mode: none
+
+#  manual_ip:
+#    static_ip: 192.168.137.32
+#    gateway: 192.168.137.1
+#    subnet: 255.255.255.0
+    
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "silviaesphotspot"
+    password: "GzKXcSCx6EsY"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: "coffeetime"
+
+ota:
+  password: "coffeetime"

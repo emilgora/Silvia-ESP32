@@ -1,23 +1,27 @@
+# Setup
+
 esphome:
   name: silviaesp32
   platform: ESP32
   board: nodemcu-32s
 
 wifi:
+  # Replace with your Wifi SSID:
   ssid: "emiladhoc"
+  # Replace with your Wifi password:
   password: "coffeetime"
   power_save_mode: none
 
+# Uncomment to assign a static IP if necessary:
 #  manual_ip:
 #    static_ip: x.x.x.x
 #    gateway: x.x.x.x
 #    subnet: 255.255.255.0
 
-
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "silviaesphotspot"
-    password: "blahblah"
+    ssid: "silviaesp32"
+    password: "ineedhelp"
 
 captive_portal:
 
@@ -30,3 +34,9 @@ api:
 
 ota:
   password: "coffeetime"
+
+# Inputs (Sensors)
+
+
+
+# Outputs (SSRs)

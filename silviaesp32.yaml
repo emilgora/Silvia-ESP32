@@ -9,15 +9,15 @@ wifi:
   power_save_mode: none
 
 #  manual_ip:
-#    static_ip: 192.168.137.32
-#    gateway: 192.168.137.1
+#    static_ip: x.x.x.x
+#    gateway: x.x.x.x
 #    subnet: 255.255.255.0
-    
+
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "silviaesphotspot"
-    password: "GzKXcSCx6EsY"
+    password: "blah"
 
 captive_portal:
 

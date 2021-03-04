@@ -34,9 +34,31 @@ api:
 
 ota:
   password: "coffeetime"
+  safe_mode: False
+  num_attempts: 100
 
-# Inputs (Sensors)
+# Inputs
 
+switch:
+  - platform: restart
+    name: "Restart ESP"
 
+# Outputs
 
-# Outputs (SSRs)
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+
+font:
+  - file: "ComicSans.ttf"
+    id: cool_font
+    size: 20
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    # If the ESP can't find the display over I2C uncommenting these might help
+    #reset_pin: D0
+    #address: 0x3c
+    lambda: |-
+      it.print(0, 0, id(cool_font), "Hello World!");

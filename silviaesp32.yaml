@@ -47,6 +47,16 @@ switch:
     pin: 33
     name: "Living Room Dehumidifier"
 
+sensor:
+  - platform: pulse_counter
+    pin: 12
+    name: "Gicar"
+    id: flow
+    unit_of_measurement: "Hz"
+    update_interval: 250ms
+    filters:
+      - lambda: return x / 60;
+
 # Outputs
 
 i2c:
@@ -61,8 +71,8 @@ font:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
-    # If the ESP can't find the display over I2C uncommenting these might help
+    # If the ESP can't find the display over I2C these might help
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.print(0, 0, id(cool_font), "Hello World!");
+      it.printf(0, 0, id(cool_font), "is: %.1f", id(flow).state);

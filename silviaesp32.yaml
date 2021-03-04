@@ -43,6 +43,10 @@ switch:
   - platform: restart
     name: "Restart ESP"
 
+  - platform: gpio
+    pin: 33
+    name: "Living Room Dehumidifier"
+
 # Outputs
 
 i2c:
@@ -58,7 +62,7 @@ display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
     # If the ESP can't find the display over I2C uncommenting these might help
-    #reset_pin: D0
+    #reset_pin: 0
     #address: 0x3c
     lambda: |-
       it.print(0, 0, id(cool_font), "Hello World!");

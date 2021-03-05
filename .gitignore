@@ -8,3 +8,6 @@
 **/src/
 **/platformio.ini
 /secrets.yaml
+
+/run.bat
+/com.bat

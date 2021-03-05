@@ -52,8 +52,8 @@ sensor:
     pin: 12
     name: "Gicar"
     id: flow
-    unit_of_measurement: "Hz"
-    update_interval: 1s
+    unit_of_measurement: "mL/s"
+    update_interval: 60s # change to 1s when finalizing
     filters:
       - lambda: return x / 60;
 
@@ -69,10 +69,17 @@ font:
     size: 20
 
 display:
-  - platform: ssd1306_i2c
+  - platform: ssd1306_i2c # SSD1306 pinouts vary
     model: "SSD1306 128x64"
-    # If the ESP can't find the display over I2C these might help
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
       it.printf(0, 0, id(cool_font), "is: %.1f", id(flow).state);
+
+esp32_ble_tracker:
+
+binary_sensor:
+  - platform: ble_presence # Commenting out this sensor will make the ESP look for BLE devices
+    mac_address: C5:71:4A:8B:10:D3 # Put your skale's MAC here 
+    name: "Skale II"
+    id: skaleii

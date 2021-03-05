@@ -1,0 +1,1 @@
+esphome silviaesp32.yaml compile

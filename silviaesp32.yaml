@@ -53,7 +53,7 @@ sensor:
     name: "Gicar"
     id: flow
     unit_of_measurement: "Hz"
-    update_interval: 250ms
+    update_interval: 1s
     filters:
       - lambda: return x / 60;
 

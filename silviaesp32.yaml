@@ -63,12 +63,6 @@ sensor:
     filters:
       - lambda: return x / 60;
 
-binary_sensor:
-  - platform: ble_presence # Commenting out this sensor will make the ESP look for BLE devices
-    mac_address: C5:71:4A:8B:10:D3 # Put your skale's MAC here 
-    name: "Skale II"
-    id: skaleii
-
 # Outputs
 
 i2c:
@@ -83,11 +77,9 @@ display:
     lambda: |-
       it.printf(0, 0, id(sys_font), "is: %.1f", id(flow).state);
 
-esp32_ble_tracker:
-
 output:
   - platform: ac_dimmer
-    id: dimmer1
+    id: pump
     gate_pin: GPIO19
     zero_cross_pin:
       number: GPIO35
@@ -96,5 +88,5 @@ output:
 
 light:
   - platform: monochromatic
-    output: dimmer1
+    output: pump
     name: Phase Angle Pump

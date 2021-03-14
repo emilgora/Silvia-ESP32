@@ -37,6 +37,12 @@ ota:
   safe_mode: False
   num_attempts: 100
 
+# Font
+font:
+  - file: "poppinsMedium.ttf"
+    id: sys_font
+    size: 20
+
 # Inputs
 
 switch:
@@ -57,16 +63,17 @@ sensor:
     filters:
       - lambda: return x / 60;
 
+binary_sensor:
+  - platform: ble_presence # Commenting out this sensor will make the ESP look for BLE devices
+    mac_address: C5:71:4A:8B:10:D3 # Put your skale's MAC here 
+    name: "Skale II"
+    id: skaleii
+
 # Outputs
 
 i2c:
   sda: GPIO21
   scl: GPIO22
-
-font:
-  - file: "ComicSans.ttf"
-    id: cool_font
-    size: 20
 
 display:
   - platform: ssd1306_i2c # SSD1306 pinouts vary
@@ -74,12 +81,20 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(cool_font), "is: %.1f", id(flow).state);
+      it.printf(0, 0, id(sys_font), "is: %.1f", id(flow).state);
 
 esp32_ble_tracker:
 
-binary_sensor:
-  - platform: ble_presence # Commenting out this sensor will make the ESP look for BLE devices
-    mac_address: C5:71:4A:8B:10:D3 # Put your skale's MAC here 
-    name: "Skale II"
-    id: skaleii
+output:
+  - platform: ac_dimmer
+    id: dimmer1
+    gate_pin: GPIO19
+    zero_cross_pin:
+      number: GPIO35
+      mode: INPUT
+      inverted: yes
+
+light:
+  - platform: monochromatic
+    output: dimmer1
+    name: Phase Angle Pump

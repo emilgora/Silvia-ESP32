@@ -51,7 +51,7 @@ switch:
 
   - platform: gpio
     pin: 33
-    name: "Living Room Dehumidifier"
+    name: "Digital Out 33"
 
 sensor:
   - platform: pulse_counter
@@ -59,9 +59,19 @@ sensor:
     name: "Gicar"
     id: flow
     unit_of_measurement: "mL/s"
-    update_interval: 60s # change to 1s when finalizing
+    update_interval: 60s # change to Xs when finalizing
     filters:
       - lambda: return x / 60;
+
+  - platform: adc
+    pin: 34
+    attenuation: 11db
+    name: "Pressure"
+    id: pressure
+    update_interval: 5s # change to Xs when finalizing
+    unit_of_measurement: Bar
+    filters:
+      - multiply: 1 # May change depending on transducer/current adapter
 
 # Outputs
 
@@ -75,7 +85,8 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(sys_font), "is: %.1f", id(flow).state);
+      it.printf(0, 0, id(sys_font), "mL.s: %.1f", id(flow).state);
+      it.printf(0, 22, id(sys_font), "bar: %.1f", id(pressure).state);
 
 output:
   - platform: ac_dimmer

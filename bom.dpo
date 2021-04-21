@@ -70,7 +70,7 @@
                     "Part": "SIlvia V6",
                     "Quantity": 1,
                     "Manufacturer": "Rancilio",
-                    "Notes": "The espresso machine in question… 110V US variant"
+                    "Notes": "The espresso machine in question"
                 },
                 {
                     "guid": "f94e1dd8-789b-4ad6-a6f4-9336bc6e73cc",
@@ -94,7 +94,7 @@
                     "Quantity": 2,
                     "Part": "D2425",
                     "Manufacturer": "Sensata-Crydom",
-                    "Notes": "25 amp solid state relay (zero cross)"
+                    "Notes": "25 amp solid state relays"
                 },
                 {
                     "guid": "63f43e80-8500-473e-9ea2-e8cc29ac52d8",

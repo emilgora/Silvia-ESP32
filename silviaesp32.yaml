@@ -85,8 +85,8 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(sys_font), "mL.s: %.1f", id(flow).state);
-      it.printf(0, 22, id(sys_font), "bar: %.1f", id(pressure).state);
+      it.printf(0, 0, id(sys_font), "mL.s: %.01f", id(flow).state);
+      it.printf(0, 22, id(sys_font), "bar: %.01f", id(pressure).state);
 
 output:
   - platform: ac_dimmer

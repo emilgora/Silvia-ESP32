@@ -4,6 +4,8 @@ esphome:
   name: silviaesp32
   platform: ESP32
   board: nodemcu-32s
+  includes:
+    - UartReadLineSensor.h
 
 wifi:
   # Replace with your Wifi SSID:
@@ -18,8 +20,7 @@ wifi:
 #    gateway: x.x.x.x
 #    subnet: 255.255.255.0
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
+  ap:  # Enable fallback hotspot (captive portal) in case wifi connection fails
     ssid: "silviaesp32"
     password: "ineedhelp"
 
@@ -27,6 +28,8 @@ captive_portal:
 
 # Enable logging
 logger:
+  level: VERBOSE #makes uart stream available in esphome logstream
+  baud_rate: 0 #disable logging over uart
 
 # Enable Home Assistant API
 api:
@@ -53,8 +56,13 @@ switch:
     pin: 33
     name: "Digital Out 33"
 
-sensor:
+uart:
+  id: uart_bus
+  tx_pin: GPIO1
+  rx_pin: GPIO3
+  baud_rate: 500000
 
+sensor:
   - platform: adc
     pin: 34
     attenuation: 11db
@@ -64,6 +72,25 @@ sensor:
     unit_of_measurement: Bar
     filters:
       - multiply: 1 # May change depending on transducer/current adapter
+
+text_sensor:
+- platform: custom
+  lambda: |-
+    auto boiler_sensor = new boilerSensor(id(uart_bus));
+    App.register_component(boiler_sensor);
+    return {boiler_sensor};
+
+  text_sensors:
+    name: "boiler sensor"
+
+- platform: custom
+  lambda: |-
+    auto group_sensor = new groupSensor(id(uart_bus));
+    App.register_component(group_sensor);
+    return {group_sensor};
+
+  text_sensors:
+    name: "group sensor"
 
 # Outputs
 

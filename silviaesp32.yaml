@@ -48,14 +48,6 @@ font:
 
 # Inputs
 
-switch:
-  - platform: restart
-    name: "Restart ESP"
-
-  - platform: gpio
-    pin: 33
-    name: "Digital Out 33"
-
 uart:
   id: uart_bus
   tx_pin: GPIO1
@@ -92,6 +84,19 @@ text_sensor:
   text_sensors:
     name: "group sensor"
 
+# Processing
+
+climate:
+  - platform: pid
+    name: "PID Controller"
+    sensor: temperature_sensor
+    default_target_temperature: 100°C
+    heat_output: boiler
+    control_parameters:
+      kp: 0.49460
+      ki: 0.00487
+      kd: 12.56301
+
 # Outputs
 
 i2c:
@@ -106,6 +111,14 @@ display:
     lambda: |-
       it.printf(0, 0, id(sys_font), "grams: %.01f", id(pressure).state);
       it.printf(0, 22, id(sys_font), "bar: %.01f", id(pressure).state);
+
+switch:
+  - platform: restart
+    name: "Restart ESP"
+
+  - platform: gpio
+    pin: 33
+    name: "Digital Out 33"
 
 output:
   - platform: ac_dimmer

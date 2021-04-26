@@ -65,33 +65,14 @@ sensor:
     filters:
       - multiply: 1 # May change depending on transducer/current adapter
 
-text_sensor:
-- platform: custom
-  lambda: |-
-    auto boiler_sensor = new boilerSensor(id(uart_bus));
-    App.register_component(boiler_sensor);
-    return {boiler_sensor};
-
-  text_sensors:
-    name: "boiler sensor"
-
-- platform: custom
-  lambda: |-
-    auto group_sensor = new groupSensor(id(uart_bus));
-    App.register_component(group_sensor);
-    return {group_sensor};
-
-  text_sensors:
-    name: "group sensor"
-
 # Processing
 
 climate:
   - platform: pid
     name: "PID Controller"
-    sensor: temperature_sensor
+    sensor: pressure
     default_target_temperature: 100°C
-    heat_output: boiler
+    heat_output: boilerSSR
     control_parameters:
       kp: 0.49460
       ki: 0.00487
@@ -128,6 +109,11 @@ output:
       number: GPIO35
       mode: INPUT
       inverted: yes
+
+  - platform: slow_pwm
+    pin: GPIO27
+    id: boilerSSR
+    period: 100ms
 
 light:
   - platform: monochromatic

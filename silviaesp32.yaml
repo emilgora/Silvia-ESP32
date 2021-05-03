@@ -54,23 +54,62 @@ uart:
   rx_pin: GPIO3
   baud_rate: 500000
 
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 25
+      mode: INPUT_PULLUP
+    name: "Steam Switch"
+    id: steamSwitch
+
+  - platform: gpio
+    pin:
+      number: 26
+      mode: INPUT_PULLUP
+    name: "Hot Water Switch"
+    id: hotWaterSwitch
+
+  - platform: gpio
+    pin:
+      number: 33
+      mode: INPUT_PULLUP
+    name: "Brew Switch"
+    id: brewSwitch
+
 sensor:
   - platform: adc
-    pin: 34
+    pin: 35 
     attenuation: 11db
     name: "Pressure"
     id: pressure
-    update_interval: 5s # change to Xs when finalizing
+    update_interval: 1s # change to Xs when finalizing
     unit_of_measurement: Bar
     filters:
       - multiply: 1 # May change depending on transducer/current adapter
+
+  - platform: pulse_width
+    pin: 23
+    update_interval: 1s
+    name: "Group Head PWM Link"
+    id: groupHeadPWMLink
+    filters:
+     - multiply: 0.1
+
+
+  - platform: pulse_width
+    pin: 22 
+    update_interval: 1s
+    name: "Boiler PWM Link"
+    id: boilerPWMLink
+    filters:
+     - multiply: 0.1
 
 # Processing
 
 climate:
   - platform: pid
     name: "PID Controller"
-    sensor: pressure
+    sensor: groupHeadPWMLink
     default_target_temperature: 100°C
     heat_output: boilerSSR
     control_parameters:
@@ -97,16 +136,17 @@ switch:
   - platform: restart
     name: "Restart ESP"
 
-  - platform: gpio
-    pin: 33
-    name: "Digital Out 33"
+light:
+  - platform: monochromatic
+    output: pump
+    name: Phase Angle Pump
 
 output:
   - platform: ac_dimmer
     id: pump
     gate_pin: GPIO19
     zero_cross_pin:
-      number: GPIO35
+      number: GPIO18
       mode: INPUT
       inverted: yes
 
@@ -114,8 +154,3 @@ output:
     pin: GPIO27
     id: boilerSSR
     period: 100ms
-
-light:
-  - platform: monochromatic
-    output: pump
-    name: Phase Angle Pump

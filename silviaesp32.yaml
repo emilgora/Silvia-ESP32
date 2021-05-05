@@ -88,7 +88,7 @@ sensor:
       - multiply: 1 # May change depending on transducer/current adapter
 
   - platform: pulse_width
-    pin: 23
+    pin: 14
     update_interval: 1s
     name: "Group Head PWM Link"
     id: groupHeadPWMLink
@@ -97,7 +97,7 @@ sensor:
 
 
   - platform: pulse_width
-    pin: 22 
+    pin: 12 
     update_interval: 1s
     name: "Boiler PWM Link"
     id: boilerPWMLink
@@ -129,7 +129,7 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(sys_font), "grams: %.01f", id(pressure).state);
+      it.printf(0, 0, id(sys_font), "temp: %.01f", id(groupHeadPWMLink).state);
       it.printf(0, 22, id(sys_font), "bar: %.01f", id(pressure).state);
 
 switch:

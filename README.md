@@ -1,3 +1,5 @@
 # Silvia ESP32
 
-This repo is a work in progress. Expecting to be finished late April.
+![Pinout](https://github.com/emilgora/Silvia-ESP32/blob/master/pinout.png?raw=true)
+
+![Wiring diagram](https://github.com/emilgora/Silvia-ESP32/blob/master/diagram.png?raw=true)

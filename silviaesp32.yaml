@@ -108,6 +108,8 @@ climate:
       kp: 0.49460
       ki: 0.00487
       kd: 12.56301
+    visual:
+      max_temperature: 100°C
 
 # Outputs
 

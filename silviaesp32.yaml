@@ -44,21 +44,7 @@ font:
     size: 20
 
 # Inputs
-
 binary_sensor:
-  - platform: gpio
-    pin:
-      number: 25
-      mode: INPUT_PULLUP
-    name: "Steam Switch"
-    id: steamSwitch
-
-  - platform: gpio
-    pin:
-      number: 26
-      mode: INPUT_PULLUP
-    name: "Hot Water Switch"
-    id: hotWaterSwitch
 
   - platform: gpio
     pin:
@@ -66,6 +52,34 @@ binary_sensor:
       mode: INPUT_PULLUP
     name: "Brew Switch"
     id: brewSwitch
+    on_press:
+     then:
+       - output.turn_on: solenoid
+       - output.turn_on: pump
+    on_release:
+     then:
+       - output.turn_off: solenoid
+       - output.turn_off: pump
+
+  - platform: gpio
+    pin:
+      number: 26
+      mode: INPUT_PULLUP
+    name: "Hot Water Switch"
+    id: hotWaterSwitch
+    on_press:
+     then:
+       - output.turn_on: pump
+    on_release:
+     then:
+       - output.turn_off: pump
+
+  - platform: gpio
+    pin:
+      number: 25
+      mode: INPUT_PULLUP
+    name: "Steam Switch"
+    id: steamSwitch
 
 sensor:
   - platform: adc
@@ -95,8 +109,6 @@ sensor:
     unit_of_measurement: "°C"
     filters:
      - multiply: 1000
-
-# Processing
 
 climate:
   - platform: pid
@@ -130,19 +142,33 @@ switch:
   - platform: restart
     name: "Restart ESP"
 
-light:
-  - platform: monochromatic
-    output: pump
-    name: Phase Angle Pump
+# Not using phase angle control for stability at the moment
+
+#light:
+#  - platform: monochromatic
+#    output: pump
+#    name: Phase Angle Pump
+
+#output:
+#  - platform: ac_dimmer
+#    id: pump
+#    gate_pin: GPIO19
+#    zero_cross_pin:
+#      number: GPIO18
+#      mode: INPUT
+#      inverted: yes
 
 output:
-  - platform: ac_dimmer
+
+  - platform: gpio
     id: pump
-    gate_pin: GPIO19
-    zero_cross_pin:
-      number: GPIO18
-      mode: INPUT
-      inverted: yes
+    pin: GPIO19
+    inverted: False
+  
+  - platform: gpio
+    id: solenoid
+    pin: GPIO5
+    inverted: False
 
   - platform: slow_pwm
     pin: GPIO16

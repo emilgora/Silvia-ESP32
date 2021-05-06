@@ -4,8 +4,6 @@ esphome:
   name: silviaesp32
   platform: ESP32
   board: nodemcu-32s
-  includes:
-    - UartReadLineSensor.h
 
 wifi:
   # Replace with your Wifi SSID:
@@ -28,8 +26,7 @@ captive_portal:
 
 # Enable logging
 logger:
-  level: VERBOSE #makes uart stream available in esphome logstream
-  baud_rate: 0 #disable logging over uart
+  baud_rate: 500000
 
 # Enable Home Assistant API
 api:
@@ -47,12 +44,6 @@ font:
     size: 20
 
 # Inputs
-
-uart:
-  id: uart_bus
-  tx_pin: GPIO1
-  rx_pin: GPIO3
-  baud_rate: 500000
 
 binary_sensor:
   - platform: gpio
@@ -88,29 +79,30 @@ sensor:
       - multiply: 1 # May change depending on transducer/current adapter
 
   - platform: pulse_width
-    pin: 14
-    update_interval: 1s
-    name: "Group Head PWM Link"
-    id: groupHeadPWMLink
-    filters:
-     - multiply: 0.1
-
-
-  - platform: pulse_width
-    pin: 12 
+    pin: GPIO12 
     update_interval: 1s
     name: "Boiler PWM Link"
     id: boilerPWMLink
+    unit_of_measurement: "°C"
     filters:
-     - multiply: 0.1
+     - multiply: 1000
+
+  - platform: pulse_width
+    pin: GPIO14
+    update_interval: 1s
+    name: "Group Head PWM Link"
+    id: groupHeadPWMLink
+    unit_of_measurement: "°C"
+    filters:
+     - multiply: 1000
 
 # Processing
 
 climate:
   - platform: pid
     name: "PID Controller"
-    sensor: groupHeadPWMLink
-    default_target_temperature: 100°C
+    sensor: boilerPWMLink
+    default_target_temperature: 70°C
     heat_output: boilerSSR
     control_parameters:
       kp: 0.49460
@@ -129,7 +121,7 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(sys_font), "temp: %.01f", id(groupHeadPWMLink).state);
+      it.printf(0, 0, id(sys_font), "temp: %.01f", id(boilerPWMLink).state);
       it.printf(0, 22, id(sys_font), "bar: %.01f", id(pressure).state);
 
 switch:
@@ -151,6 +143,6 @@ output:
       inverted: yes
 
   - platform: slow_pwm
-    pin: GPIO27
+    pin: GPIO16
     id: boilerSSR
     period: 100ms

@@ -1,22 +1,30 @@
+#include <analogWrite.h>
+
 #include <ZACwire.h>
 
 
-ZACwire<16> boilerSensor(306);    // set pin "2" to receive signal from the TSic "306"
-ZACwire<17> groupSensor(306);
+ZACwire<26> boilerSensor(306);
 
-const int boilerPin = 22;
-const int groupPin = 23;
+// disabling grouphead sensor for stability at the moment
+//ZACwire<27> groupSensor(306);
+
+const int boilerPWMPin = 12;
+//const int groupPWMPin = 14;
 
 void setup() {
   Serial.begin(500000);
 
   if (boilerSensor.begin() == true) {     //check if a sensor is connected to pin 10
-    Serial.println("Signal found on 10");
+    Serial.println("Signal found on bS");
   }
+  /*
   if (groupSensor.begin() == true) {     //check if a sensor is connected to pin 11
-    Serial.println("Signal found on 11");
+    Serial.println("Signal found on gS");
   }
-  
+  */
+  analogWriteFrequency(boilerPWMPin, 10);
+  analogWriteResolution(boilerPWMPin, 10);
+
   delay(300);
 }
 
@@ -24,34 +32,34 @@ void loop() {
   
   float boilerTemp = boilerSensor.getTemp();
   if (boilerTemp == 222) {
-    Serial.println("Reading failed on 10");
+    Serial.println("Reading failed on bS");
   }
   else if (boilerTemp == 221) {
-    Serial.println("Sensor not connected on 10");
+    Serial.println("Sensor not connected on bS");
   }
 
+  /*
   float groupTemp = groupSensor.getTemp();
   if (groupTemp == 222) {
-    Serial.println("Reading failed on 11");
+    Serial.println("Reading failed on gS");
   }
   else if (groupTemp == 221) {
-    Serial.println("Sensor not connected on 11");
+    Serial.println("Sensor not connected on gS");
   }
+  */
   
   else {
 
-    // PWM @ 16 bit resolution
-    // Multiplying by 10 to shift float by one decimal place
-    // The main ESP will multiply by 0.1 to reverse this
-    boilerTemp*10;
-    groupTemp*10;
+    // Multiplying by 10 will shift the float by one decimal place. An ESPHome filter shifts it back one place.
+    int boilerTempE10 = boilerTemp*10;
     
-    //analogWrite(boilerPin,boilerTemp*10);  
-    //analogWrite(groupPin,groupTemp*10);
-    
+    analogWrite(boilerPWMPin,boilerTempE10);  
+    //analogWrite(groupPin,groupTemp);
+
     Serial.print(boilerTemp);
     Serial.print("x");
-    Serial.println(groupTemp);
+    Serial.println(boilerTempE10);
+    //Serial.print(groupTemp);
     
     // Writes temp as a PWM width to be read by the main ESP
   }

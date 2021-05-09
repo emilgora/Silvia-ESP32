@@ -55,11 +55,32 @@ binary_sensor:
     on_press:
      then:
        - output.turn_on: solenoid
-       - output.turn_on: pump
+       - delay: 1s
+      # - output.turn_on: pump
+       - output.set_level: # maybe make these delays and %s user-input vars?
+           id: pump
+           level: 20%
+       - delay: 5s # AKA preinfusion time
+       - output.set_level: 
+           id: pump
+           level: 80% # to-do: input pressure values and control pump with control loop to reach those pressures
+       - delay: 10s
+       - output.set_level: 
+           id: pump
+           level: 70%
+       - delay: 15s
+       - output.turn_off: solenoid
+       - output.set_level: 
+           id: pump
+           level: 0%
+
     on_release:
      then:
        - output.turn_off: solenoid
-       - output.turn_off: pump
+      # - output.turn_off: pump
+       - output.set_level:
+           id: pump
+           level: 0%
 
   - platform: gpio
     pin:
@@ -69,10 +90,16 @@ binary_sensor:
     id: hotWaterSwitch
     on_press:
      then:
-       - output.turn_on: pump
+      # - output.turn_on: pump
+       - output.set_level:
+           id: pump
+           level: 100%
     on_release:
      then:
-       - output.turn_off: pump
+      # - output.turn_off: pump
+       - output.set_level:
+           id: pump
+           level: 0%
 
   - platform: gpio
     pin:
@@ -114,7 +141,7 @@ climate:
   - platform: pid
     name: "PID Controller"
     sensor: boilerPWMLink
-    default_target_temperature: 70°C
+    default_target_temperature: 90°C
     heat_output: boilerSSR
     control_parameters:
       kp: 0.49460
@@ -144,26 +171,12 @@ switch:
 
 # Not using phase angle control for stability at the moment
 
-#light:
-#  - platform: monochromatic
-#    output: pump
-#    name: Phase Angle Pump
-
-#output:
-#  - platform: ac_dimmer
-#    id: pump
-#    gate_pin: GPIO19
-#    zero_cross_pin:
-#      number: GPIO18
-#      mode: INPUT
-#      inverted: yes
-
 output:
 
-  - platform: gpio
-    id: pump
-    pin: GPIO19
-    inverted: False
+ # - platform: gpio
+ #   id: pump
+ #   pin: GPIO19
+ #   inverted: False
   
   - platform: gpio
     id: solenoid
@@ -174,3 +187,16 @@ output:
     pin: GPIO16
     id: boilerSSR
     period: 100ms
+
+  - platform: ac_dimmer
+    id: pump
+    gate_pin: GPIO19
+    zero_cross_pin:
+      number: GPIO18
+      mode: INPUT
+      inverted: yes
+
+light:
+  - platform: monochromatic
+    output: pump
+    name: Phase Angle Pump

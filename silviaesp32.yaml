@@ -7,7 +7,7 @@ esphome:
 
 wifi:
   # Replace with your Wifi SSID:
-  ssid: "emiladhoc"
+  ssid: "emiladhoc" # This is the name of my laptop's hotspot
   # Replace with your Wifi password:
   password: "coffeetime"
   power_save_mode: none
@@ -44,77 +44,18 @@ font:
     size: 20
 
 # Inputs
-binary_sensor:
-
-  - platform: gpio
-    pin:
-      number: 33
-      mode: INPUT_PULLUP
-    name: "Brew Switch"
-    id: brewSwitch
-    on_press:
-     then:
-       - output.turn_on: solenoid
-       - delay: 1s
-      # - output.turn_on: pump
-       - output.set_level: # maybe make these delays and %s user-input vars?
-           id: pump
-           level: 20%
-       - delay: 5s # AKA preinfusion time
-       - output.set_level: 
-           id: pump
-           level: 80% # to-do: input pressure values and control pump with control loop to reach those pressures
-       - delay: 10s
-       - output.set_level: 
-           id: pump
-           level: 70%
-       - delay: 15s
-       - output.turn_off: solenoid
-       - output.set_level: 
-           id: pump
-           level: 0%
-
-    on_release:
-     then:
-       - output.turn_off: solenoid
-      # - output.turn_off: pump
-       - output.set_level:
-           id: pump
-           level: 0%
-
-  - platform: gpio
-    pin:
-      number: 26
-      mode: INPUT_PULLUP
-    name: "Hot Water Switch"
-    id: hotWaterSwitch
-    on_press:
-     then:
-      # - output.turn_on: pump
-       - output.set_level:
-           id: pump
-           level: 100%
-    on_release:
-     then:
-      # - output.turn_off: pump
-       - output.set_level:
-           id: pump
-           level: 0%
-
-  - platform: gpio
-    pin:
-      number: 25
-      mode: INPUT_PULLUP
-    name: "Steam Switch"
-    id: steamSwitch
 
 sensor:
+
+  # to-do: Make a native zacwire library for ESPHome. I can already tell interrupts are going to be a big issue with this. At the moment we're using a second ESP with Lebuni's library (https://github.com/lebuni/ZACwire-Library) for the TSic306s.
+  # to-do: Create a better card to display/log these values. The default card only shows the last hour of data (and we want a ~1 minute range.) 
+
   - platform: adc
     pin: 35 
     attenuation: 11db
     name: "Pressure"
     id: pressure
-    update_interval: 1s # change to Xs when finalizing
+    update_interval: 1s
     unit_of_measurement: Bar
     filters:
       - multiply: 1 # May change depending on transducer/current adapter
@@ -136,6 +77,106 @@ sensor:
     unit_of_measurement: "°C"
     filters:
      - multiply: 1000
+  
+  # Make sure your HA config is looking for these
+  - platform: homeassistant
+    entity_id: sensor.preinfusion_time
+    id: preinfusionTime
+    unit_of_measurement: "s"
+  - platform: homeassistant
+    entity_id: sensor.preinfusion_power
+    id: preinfusionPower
+    unit_of_measurement: "%"
+  - platform: homeassistant
+    entity_id: sensor.initial_time
+    id: initialTime
+    unit_of_measurement: "s"
+  - platform: homeassistant
+    entity_id: sensor.initial_power
+    id: initialPower
+    unit_of_measurement: "%"
+  - platform: homeassistant
+    entity_id: sensor.ramp_time
+    id: rampTime
+    unit_of_measurement: "s"
+  - platform: homeassistant
+    entity_id: sensor.ramp_power
+    id: rampPower
+    unit_of_measurement: "%"
+
+binary_sensor:
+
+  - platform: gpio
+    pin:
+      number: 33
+      mode: INPUT_PULLUP
+    name: "Brew Switch"
+    id: brewSwitch
+    on_press:
+     then:
+       - output.turn_on: solenoid
+       - delay: 1s # in case solenoid sticks for some reason
+
+      # Delay and level values are grabbed from the HA frontend
+
+      # to-do: feed pressure values into a control loop to reach a pressure rather than phase %
+      # to-do: cancel actions if user flips switch off half-way through the shot
+      # to-do: create a smooth curve between power levels (use lambdas?)
+      # to-do: dropdown list of profiles with a load/save feature (use JSON files?)
+
+       - output.set_level: # AKA preinfusion
+           id: pump
+           level: preinfusionPower
+       - delay: preinfusionTime
+
+       - output.set_level: #AKA initial
+           id: pump
+           level: initialPower
+       - delay: initialTime
+
+       - output.set_level: #AKA ramp
+           id: pump
+           level: rampPower
+       - delay: rampTime
+
+       # Brew profile is finished
+
+       - output.turn_off: solenoid
+       - output.set_level: 
+           id: pump
+           level: 0% 
+
+    on_release:
+     then:
+       - output.turn_off: solenoid
+      # - output.turn_off: pump
+       - output.set_level:
+           id: pump
+           level: 0%
+
+  - platform: gpio
+    pin:
+      number: 26
+      mode: INPUT_PULLUP
+    name: "Hot Water Switch"
+    id: hotWaterSwitch
+    on_press:
+     then:
+       - output.set_level:
+           id: pump
+           level: 100%
+    on_release:
+     then:
+       - output.set_level:
+           id: pump
+           level: 0%
+
+  - platform: gpio
+    pin:
+      number: 25
+      mode: INPUT_PULLUP
+    name: "Steam Switch"
+    id: steamSwitch
 
 climate:
   - platform: pid
@@ -162,7 +203,7 @@ display:
     #reset_pin: 0
     #address: 0x3c
     lambda: |-
-      it.printf(0, 0, id(sys_font), "temp: %.01f", id(boilerPWMLink).state);
+      it.printf(0, 0, id(sys_font), "deg: %.01f", id(boilerPWMLink).state);
       it.printf(0, 22, id(sys_font), "bar: %.01f", id(pressure).state);
 
 switch:
@@ -173,11 +214,6 @@ switch:
 
 output:
 
- # - platform: gpio
- #   id: pump
- #   pin: GPIO19
- #   inverted: False
-  
   - platform: gpio
     id: solenoid
     pin: GPIO5
